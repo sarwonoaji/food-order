@@ -15,155 +15,102 @@
 
 </div>
 
+
 @if(count($cart) > 0)
 
-@php
-    $total = 0;
-@endphp
+@php $total = 0; @endphp
 
-<!-- Cart Items -->
-<div class="space-y-4 pb-44">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-40">
 
-    @foreach($cart as $item)
+    <!-- Items list -->
+    <div class="lg:col-span-2 space-y-4">
 
-    @php
-        $subtotal = $item['price'] * $item['qty'];
-        $total += $subtotal;
-    @endphp
+        @foreach($cart as $item)
 
-    <div
-        class="bg-white rounded-3xl p-4 shadow-md border border-gray-100 flex gap-4"
-    >
+            @php
+                $subtotal = $item['price'] * $item['qty'];
+                $total += $subtotal;
+            @endphp
 
-        <!-- Image -->
-        <img
-            src="{{ asset('storage/' . $item['image']) }}"
-            class="w-24 h-24 rounded-2xl object-cover"
-        >
+            <div class="flex gap-4 items-center bg-white rounded-2xl p-4 shadow-sm border">
 
-        <!-- Content -->
-        <div class="flex-1 flex flex-col justify-between">
+                <img src="{{ asset('img/products/' . $item['image']) }}" class="w-28 h-28 rounded-xl object-cover" alt="{{ $item['name'] }}">
 
-            <div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $item['description'] ?? '' }}</p>
+                        </div>
 
-                <h2 class="font-bold text-gray-800 text-lg line-clamp-1">
-                    {{ $item['name'] }}
-                </h2>
+                        <div class="text-right">
+                            <div class="text-orange-500 font-bold">Rp {{ number_format($subtotal) }}</div>
+                        </div>
+                    </div>
 
-                <div class="text-sm text-gray-500 mt-1">
-                    Qty: {{ $item['qty'] }}
+                    <div class="mt-3 flex items-center justify-between">
+
+                        <div class="inline-flex items-center gap-2 border rounded-full overflow-hidden">
+                            <form action="/cart/remove-one/{{ $item['id'] }}" method="POST">
+                                @csrf
+                                <button class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
+                            </form>
+
+                            <div class="px-4 py-2 bg-white text-sm">{{ $item['qty'] }}</div>
+
+                            <form action="/cart/add/{{ $item['id'] }}" method="POST">
+                                @csrf
+                                <button class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
+                            </form>
+                        </div>
+
+                        <form action="/cart/remove/{{ $item['id'] }}" method="POST">
+                            @csrf
+                            <button class="btn btn-sm btn-ghost text-red-500">Hapus</button>
+                        </form>
+
+                    </div>
                 </div>
 
             </div>
 
-            <div class="flex items-center justify-between mt-3">
-
-                <div class="text-orange-500 font-bold text-lg">
-                    Rp {{ number_format($subtotal) }}
-                </div>
-
-                <form
-                    action="/cart/remove/{{ $item['id'] }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        class="btn btn-sm bg-red-500 hover:bg-red-600 border-0 text-white rounded-xl"
-                    >
-                        Hapus
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
+        @endforeach
 
     </div>
 
-    @endforeach
+    <!-- Summary -->
+    <aside class="bg-white rounded-2xl p-6 shadow-sm border">
 
-</div>
+        <h2 class="text-lg font-semibold mb-4">Ringkasan Pesanan</h2>
 
-<!-- Checkout Form -->
-<div class="bg-white rounded-3xl p-5 shadow-md border border-gray-100 mb-40">
-
-    <form action="/checkout" method="POST">
-
-        @csrf
-
-        <h2 class="text-xl font-bold text-gray-800 mb-5">
-            Informasi Pemesan
-        </h2>
-
-        <div class="space-y-4">
-
-            <!-- Nama -->
-            <div>
-
-                <label class="font-semibold text-sm text-gray-700">
-                    Nama Customer
-                </label>
-
-                <input
-                    type="text"
-                    name="customer_name"
-                    class="input input-bordered w-full mt-2 rounded-2xl"
-                    placeholder="Masukkan nama customer"
-                >
-
+        <div class="space-y-3 mb-4">
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Jumlah Item</span>
+                <span>{{ collect($cart)->sum('qty') }}</span>
             </div>
-
-            <!-- Meja -->
-            <div>
-
-                <label class="font-semibold text-sm text-gray-700">
-                    Nomor Meja
-                </label>
-
-                <input
-                    type="text"
-                    name="table_number"
-                    class="input input-bordered w-full mt-2 rounded-2xl"
-                    placeholder="Contoh: A1"
-                >
-
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Subtotal</span>
+                <span>Rp {{ number_format($total) }}</span>
             </div>
-
         </div>
 
-        <!-- Bottom Checkout -->
-        <div
-            class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl p-4"
-        >
+        <form action="/checkout" method="POST">
+            @csrf
 
-            <div class="container mx-auto flex items-center justify-between gap-4">
+            <div class="space-y-3">
+                <label class="text-sm text-gray-700">Nama</label>
+                <input type="text" name="customer_name" class="input input-bordered w-full rounded-lg" placeholder="Nama pemesan">
 
-                <div>
-
-                    <div class="text-sm text-gray-500">
-                        Total Pembayaran
-                    </div>
-
-                    <div class="text-2xl font-bold text-orange-500">
-                        Rp {{ number_format($total) }}
-                    </div>
-
-                </div>
-
-                <button
-                    class="btn bg-orange-500 hover:bg-orange-600 border-0 text-white rounded-2xl px-8"
-                >
-                    Checkout
-                </button>
-
+                <label class="text-sm text-gray-700">Nomor Meja</label>
+                <input type="text" name="table_number" class="input input-bordered w-full rounded-lg" placeholder="Contoh: A1">
             </div>
 
-        </div>
+            <div class="mt-6">
+                <button class="btn w-full bg-orange-500 hover:bg-orange-600 text-white">Checkout — Rp {{ number_format($total) }}</button>
+            </div>
+        </form>
 
-    </form>
+    </aside>
 
 </div>
 

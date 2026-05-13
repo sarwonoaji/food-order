@@ -100,10 +100,13 @@ class CartController extends Controller
 
         DB::commit();
 
+        // store last order id so front-end can link to status
+        session()->put('last_order_id', $order->id);
+
         session()->forget('cart');
 
         return redirect('/order/' . $order->id)
-    ->with('success', 'Pesanan berhasil dibuat');
+            ->with('success', 'Pesanan berhasil dibuat');
 
     } catch (\Exception $e) {
 

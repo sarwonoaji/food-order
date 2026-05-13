@@ -27,11 +27,26 @@ $cartCount = collect($cart)->sum('qty');
 
         </div>
 
-        <!-- Cart -->
-        <a
-            href="/cart"
-            class="relative"
-        >
+        <!-- Cart + Check Order -->
+        <div class="flex items-center gap-3">
+
+            {{-- direct link to last order if exists --}}
+            @if(session('last_order_id'))
+                <a href="/order/{{ session('last_order_id') }}" class="btn btn-sm btn-outline hidden sm:inline-flex">Lihat Pesanan</a>
+            @endif
+
+            <div class="hidden sm:block">
+                <form id="check-order-form" onsubmit="return goToOrder(event)" class="flex items-center">
+                    <input type="text" id="check-order-id" placeholder="Cek pesanan (ID)" class="input input-sm input-bordered rounded-full pr-10" aria-label="Cek pesanan ID">
+                    <button type="submit" class="btn btn-sm ml-2">Cek</button>
+                </form>
+            </div>
+
+            <!-- Cart -->
+            <a
+                href="/cart"
+                class="relative"
+            >
 
             <button
                 class="btn btn-circle bg-orange-500 hover:bg-orange-600 border-0 text-white shadow-lg"
@@ -66,6 +81,18 @@ $cartCount = collect($cart)->sum('qty');
 
         </a>
 
+        <script>
+            function goToOrder(e) {
+                e.preventDefault();
+                var id = document.getElementById('check-order-id').value.trim();
+                if (!id) return false;
+                // basic sanitize: allow only digits
+                id = encodeURIComponent(id);
+                window.location.href = '/order/' + id;
+                return false;
+            }
+        </script>
+
     </div>
 
 </div>
@@ -73,21 +100,26 @@ $cartCount = collect($cart)->sum('qty');
 <!-- Search -->
 <div class="mb-6">
 
-    <div class="relative">
+    <form action="/" method="GET" class="relative">
 
         <input
-            type="text"
+            type="search"
+            name="q"
+            value="{{ isset($term) ? $term : request('q') }}"
             placeholder="Cari makanan atau minuman..."
-            class="input input-bordered w-full rounded-2xl pl-12 bg-white border-gray-200 shadow-sm"
+            class="input input-bordered w-full rounded-2xl pl-12 bg-white border-gray-200 shadow-sm focus:shadow-md"
+            aria-label="Cari produk"
         >
 
-        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+        <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2.5a7.5 7.5 0 010 14.15z"/></svg>
+        </button>
 
-            🔍
+        @if(request('category'))
+            <input type="hidden" name="category" value="{{ request('category') }}">
+        @endif
 
-        </div>
-
-    </div>
+    </form>
 
 </div>
 
@@ -144,81 +176,35 @@ $cartCount = collect($cart)->sum('qty');
 
 </div>
 
-<!-- Product Grid -->
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Product Grid (2 cards per row) -->
+<div class="grid grid-cols-2 gap-6">
 
     @foreach($products as $product)
 
-    <div
-        class="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 border border-gray-100"
-    >
+    <div class="card card-compact bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition duration-200 border">
 
-        <!-- Image -->
-        <div class="relative">
-
+        <figure class="relative">
             @if($product->image)
-
-            <img
-                src="{{ asset('storage/' . $product->image) }}"
-                alt="{{ $product->name }}"
-                class="w-full h-40 object-cover"
-            >
-
+                <img src="{{ asset('img/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-44 object-cover">
             @else
-
-            <img
-                src="https://placehold.co/600x400?text=No+Image"
-                alt="no image"
-                class="w-full h-40 object-cover"
-            >
-
+                <div class="w-full h-44 bg-base-200 flex items-center justify-center text-sm text-muted">No Image</div>
             @endif
 
-            <!-- Category Badge -->
-            <div
-                class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-orange-500 shadow"
-            >
-                {{ $product->category }}
-            </div>
+            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-orange-500 shadow">{{ $product->category }}</div>
+        </figure>
 
-        </div>
-
-        <!-- Body -->
         <div class="p-4">
+            <h3 class="font-semibold text-gray-800 text-sm md:text-base line-clamp-2">{{ $product->name }}</h3>
+            <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ $product->description }}</p>
 
-            <h2 class="font-bold text-gray-800 text-sm md:text-base line-clamp-1">
-                {{ $product->name }}
-            </h2>
-
-            <p class="text-gray-500 text-xs mt-1 line-clamp-2 min-h-[32px]">
-                {{ $product->description }}
-            </p>
-
-            <!-- Footer -->
             <div class="mt-4 flex items-center justify-between">
-
-                <div>
-
-                    <div class="text-orange-500 font-bold text-sm md:text-lg">
-                        Rp {{ number_format($product->price) }}
-                    </div>
-
-                </div>
+                <div class="text-orange-500 font-bold">Rp {{ number_format($product->price) }}</div>
 
                 <form action="/cart/add/{{ $product->id }}" method="POST">
-
                     @csrf
-
-                    <button
-                        class="w-10 h-10 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-lg transition"
-                    >
-                        +
-                    </button>
-
+                    <button class="btn btn-sm btn-primary rounded-xl px-3 py-2">Tambah</button>
                 </form>
-
             </div>
-
         </div>
 
     </div>
@@ -256,5 +242,14 @@ $cartCount = collect($cart)->sum('qty');
     </div>
 
 </a>
+@if(session('last_order_id'))
+    <a href="/order/{{ session('last_order_id') }}" class="fixed bottom-5 right-20 md:hidden z-50">
+        <div class="relative">
+            <button class="btn btn-circle w-14 h-14 bg-white text-orange-500 border shadow-lg">
+                🧾
+            </button>
+        </div>
+    </a>
+@endif
 
 @endsection

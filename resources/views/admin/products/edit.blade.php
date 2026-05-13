@@ -9,11 +9,12 @@
         <div class="card-body">
 
             <h2 class="card-title text-2xl mb-5">
-                Tambah Produk
+                Edit Produk
             </h2>
-                    <form action="/admin/products" method="POST" enctype="multipart/form-data">
+                    <form action="/admin/products/{{ $product->id }}" method="POST" enctype="multipart/form-data">
 
                         @csrf
+                        @method('PUT')
 
                         @if($errors->any())
                             <div class="alert alert-error mb-4">
@@ -28,7 +29,7 @@
 
                             <div class="form-control">
                                 <label class="label"><span class="label-text font-semibold text-sm">Nama Produk</span></label>
-                                    <input type="text" name="name" class="input input-bordered input-lg w-full" placeholder="Contoh: Nasi Goreng" aria-label="Nama Produk" value="{{ old('name') }}">
+                                <input type="text" name="name" class="input input-bordered input-lg w-full" placeholder="Contoh: Nasi Goreng" aria-label="Nama Produk" value="{{ old('name', $product->name) }}">
                                 @error('name') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                             </div>
 
@@ -36,22 +37,22 @@
                                 <label class="label"><span class="label-text font-semibold text-sm">Kategori</span></label>
                                 <select name="category" class="select select-bordered select-lg w-full" aria-label="Kategori">
                                     <option value="">Pilih Kategori</option>
-                                    <option value="Makanan" {{ old('category') == 'Makanan' ? 'selected' : '' }}>Makanan</option>
-                                    <option value="Minuman" {{ old('category') == 'Minuman' ? 'selected' : '' }}>Minuman</option>
-                                    <option value="Snack" {{ old('category') == 'Snack' ? 'selected' : '' }}>Snack</option>
+                                    <option value="Makanan" {{ (old('category', $product->category) == 'Makanan') ? 'selected' : '' }}>Makanan</option>
+                                    <option value="Minuman" {{ (old('category', $product->category) == 'Minuman') ? 'selected' : '' }}>Minuman</option>
+                                    <option value="Snack" {{ (old('category', $product->category) == 'Snack') ? 'selected' : '' }}>Snack</option>
                                 </select>
                                 @error('category') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="form-control">
                                 <label class="label"><span class="label-text font-semibold text-sm">Harga</span></label>
-                                <input type="number" name="price" class="input input-bordered input-lg w-full" placeholder="10000" aria-label="Harga" value="{{ old('price') }}">
+                                <input type="number" name="price" class="input input-bordered input-lg w-full" placeholder="10000" aria-label="Harga" value="{{ old('price', $product->price) }}">
                                 @error('price') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="form-control">
-                                <label class="label"><span class="label-text font-semibold text-sm">Gambar</span></label>
-                                <input type="file" name="image" accept="image/*" class="file-input file-input-bordered w-full" aria-label="Gambar produk">
+                                <label class="label"><span class="label-text font-semibold text-sm">Ganti Gambar</span></label>
+                                <input type="file" name="image" accept="image/*" class="file-input file-input-bordered w-full" aria-label="Ganti gambar produk">
                                 @error('image') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                             </div>
 
@@ -59,12 +60,21 @@
 
                         <div class="form-control mt-4">
                             <label class="label"><span class="label-text font-semibold text-sm">Deskripsi</span></label>
-                            <textarea name="description" class="textarea textarea-bordered min-h-[120px] p-3" placeholder="Deskripsi singkat produk (mis. bahan, porsi, catatan)" aria-label="Deskripsi">{{ old('description') }}</textarea>
+                            <textarea name="description" class="textarea textarea-bordered min-h-[120px] p-3" placeholder="Deskripsi singkat produk (mis. bahan, porsi, catatan)" aria-label="Deskripsi">{{ old('description', $product->description) }}</textarea>
                             @error('description') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        <div class="mt-4">
+                            <label class="label"><span class="label-text">Gambar Saat Ini</span></label>
+                            @if($product->image)
+                                <img src="{{ asset('img/products/' . $product->image) }}" alt="{{ $product->name }}" class="mb-3 w-48 h-auto object-cover rounded">
+                            @else
+                                <p class="text-sm text-muted">Tidak ada gambar</p>
+                            @endif
+                        </div>
+
                         <div class="mt-6">
-                            <button class="btn btn-warning w-full">Simpan Produk</button>
+                            <button class="btn btn-warning w-full">Update Produk</button>
                         </div>
 
                     </form>

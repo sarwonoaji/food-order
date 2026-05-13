@@ -11,9 +11,19 @@ class ProductAdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->get();
+        $query = Product::query();
+
+        if ($request->filled('q')) {
+            $term = $request->q;
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('category', 'like', "%{$term}%");
+            });
+        }
+
+        $products = $query->latest()->get();
 
         return view('admin.products.index', compact('products'));
     }
@@ -39,11 +49,18 @@ class ProductAdminController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
-        $image = null;
+       // upload foto
+        if ($request->file('image')) {
+            $file = $request->file('image');
+            $filename = uniqid('products_', true) . '.' . $file->extension();
+            $destination = public_path('img/products');
 
-        if ($request->hasFile('image')) {
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
 
-            $image = $request->file('image')->store('products', 'public');
+            $file->move($destination, $filename);
+            $data['image'] = $filename;
         }
 
         Product::create([
@@ -51,7 +68,7 @@ class ProductAdminController extends Controller
             'category' => $request->category,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $image,
+            'image' => $data['image'] ?? null,
         ]);
 
         return redirect('/admin/products')
@@ -79,11 +96,30 @@ class ProductAdminController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
-        $image = $product->image;
+                  // upload image baru
+        if ($request->file('image')) {
 
-        if ($request->hasFile('image')) {
+            // hapus image lama jika ada
+            if ($product->image) {
+                $oldImage = public_path('img/products/' . $product->image);
 
-            $image = $request->file('image')->store('products', 'public');
+                if (file_exists($oldImage)) {
+                    unlink($oldImage);
+                }
+            }
+
+            // upload image baru
+            $file = $request->file('image');
+            $filename = uniqid('products_', true) . '.' . $file->extension();
+            $destination = public_path('img/products');
+
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            $file->move($destination, $filename);
+
+            $data['image'] = $filename;
         }
 
         $product->update([
@@ -91,7 +127,7 @@ class ProductAdminController extends Controller
             'category' => $request->category,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $image,
+            'image' => $data['image'] ?? $product->image,
         ]);
 
         return redirect('/admin/products')

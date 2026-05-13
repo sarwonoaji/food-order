@@ -32,15 +32,7 @@ $cartCount = count($cart);
                 </a>
 
             </div>
-
-            <div class="flex-none gap-2">
-
-                <button class="btn btn-sm btn-warning text-white rounded-xl">
-                    Keranjang
-                </button>
-
-            </div>
-
+            
         </div>
 
     </div>
