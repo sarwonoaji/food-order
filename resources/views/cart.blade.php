@@ -13,10 +13,6 @@
         Review pesanan kamu 🍜
     </p>
 
-    <div class="mt-4">
-        <a href="/" class="btn bg-orange-500 hover:bg-orange-600 border-0 text-white rounded-2xl px-4">Kembali ke Menu</a>
-    </div>
-
 </div>
 
 
