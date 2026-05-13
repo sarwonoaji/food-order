@@ -99,11 +99,9 @@
 
             <div class="space-y-3">
                 <label class="text-sm text-gray-700">Nama</label>
-                <input type="text" name="customer_name" class="input input-bordered w-full rounded-lg" placeholder="Nama pemesan">
+                <input type="text" name="customer_name" class="input input-bordered w-full rounded-lg" placeholder="Nama pemesan" required>
 
-                <label class="text-sm text-gray-700">Nomor Meja</label>
-                <input type="text" name="table_number" class="input input-bordered w-full rounded-lg" placeholder="Contoh: A1">
-            </div>
+           </div>
 
             <div class="mt-6">
                 <button class="btn w-full bg-orange-500 hover:bg-orange-600 text-white">Checkout — Rp {{ number_format($total) }}</button>

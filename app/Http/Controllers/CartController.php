@@ -124,7 +124,7 @@ class CartController extends Controller
             $order->customer_name = $request->customer_name ?? $order->customer_name;
             $order->table_number = session('table_number') ?? $request->table_number;
             $order->total = $total;
-            $order->status = 'SELESAI';
+            $order->status = 'DIPROSES';
             $order->save();
 
         } else {
@@ -138,7 +138,7 @@ class CartController extends Controller
                 'customer_name' => $request->customer_name,
                 'table_number' => $request->table_number,
                 'total' => $total,
-                'status' => 'SELESAI',
+                'status' => 'DIPROSES',
             ]);
 
             foreach($cart as $item) {

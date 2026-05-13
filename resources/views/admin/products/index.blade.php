@@ -73,11 +73,18 @@
 
                     <td class="text-right">
                         <div class="inline-flex items-center gap-2">
-                            <a href="/admin/products/{{ $product->id }}/edit" class="btn btn-sm btn-info">Edit</a>
-                            <form action="/admin/products/{{ $product->id }}" method="POST" onsubmit="return confirm('Hapus produk ini?')">
+                            <a href="/admin/products/{{ $product->id }}/edit" class="btn btn-sm btn-ghost flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150" title="Edit {{ $product->name }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h6m-6 4h6M5 7h.01M5 11h.01M5 15h.01M5 19h.01"/></svg>
+                                <span class="hidden sm:inline">Edit</span>
+                            </a>
+
+                            <form action="/admin/products/{{ $product->id }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-error">Hapus</button>
+                                <button class="btn btn-sm btn-error flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-red-600 transition-colors duration-150" title="Hapus {{ $product->name }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+                                    <span class="hidden sm:inline">Hapus</span>
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -93,5 +100,9 @@
     </div>
 
 @endif
+
+<div class="mt-4">
+    {{ $products->links() }}
+</div>
 
 @endsection
