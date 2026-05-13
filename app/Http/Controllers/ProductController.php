@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,12 +13,66 @@ class ProductController extends Controller
         $category = $request->category;
         $term = $request->q;
 
-        $products = Product::query()
+        // If a table param is present (scanned QR), create/open an order and set session
+        if ($request->filled('table')) {
+            $table = $request->table;
+            session()->put('table_number', $table);
 
+            $orderId = session('order_id');
+
+            if ($orderId) {
+                $existing = Order::find($orderId);
+                // if the session order is missing, closed, or belongs to a different table,
+                // try to find an existing open order for this table; otherwise create new
+                if (!$existing || $existing->status === 'SELESAI' || $existing->table_number !== $table) {
+                    $open = Order::where('table_number', $table)
+                        ->where('status', '!=', 'SELESAI')
+                        ->latest()
+                        ->first();
+
+                    if ($open) {
+                        session()->put('order_id', $open->id);
+                        session()->put('last_order_id', $open->id);
+                    } else {
+                        $order = Order::create([
+                            'customer_name' => null,
+                            'table_number' => $table,
+                            'total' => 0,
+                            'status' => 'MENUNGGU',
+                        ]);
+
+                        session()->put('order_id', $order->id);
+                        session()->put('last_order_id', $order->id);
+                    }
+                }
+            } else {
+                // no order in session: try to reuse an open order for this table
+                $open = Order::where('table_number', $table)
+                    ->where('status', '!=', 'SELESAI')
+                    ->latest()
+                    ->first();
+
+                if ($open) {
+                    session()->put('order_id', $open->id);
+                    session()->put('last_order_id', $open->id);
+                } else {
+                    $order = Order::create([
+                        'customer_name' => null,
+                        'table_number' => $table,
+                        'total' => 0,
+                        'status' => 'MENUNGGU',
+                    ]);
+
+                    session()->put('order_id', $order->id);
+                    session()->put('last_order_id', $order->id);
+                }
+            }
+        }
+
+        $products = Product::query()
             ->when($category, function ($query) use ($category) {
                 $query->where('category', $category);
             })
-
             ->when($term, function ($query) use ($term) {
                 $query->where(function ($q) use ($term) {
                     $q->where('name', 'like', "%{$term}%")
@@ -25,7 +80,6 @@ class ProductController extends Controller
                       ->orWhere('category', 'like', "%{$term}%");
                 });
             })
-
             ->latest()
             ->get();
 
