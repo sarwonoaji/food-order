@@ -45,6 +45,9 @@ class CartController extends Controller
         if ($orderId) {
             $order = Order::find($orderId);
             if ($order) {
+                // Use the current batch number from session
+                $currentBatch = session('batch_number', 1);
+                
                 $orderItem = OrderItem::where('order_id', $orderId)->where('product_id', $product->id)->first();
 
                 if ($orderItem) {
@@ -57,6 +60,7 @@ class CartController extends Controller
                         'qty' => 1,
                         'price' => $product->price,
                         'note' => null,
+                        'batch' => $currentBatch,
                     ]);
                 }
             }
@@ -108,23 +112,48 @@ class CartController extends Controller
         if ($orderId) {
             $order = Order::with('items')->find($orderId);
 
-            // compute total from persisted order items (fallback to session cart)
-            if ($order && $order->items->count() > 0) {
-                $total = 0;
-                foreach ($order->items as $it) {
-                    $total += $it->price * $it->qty;
+            // Handle any cart items that haven't been persisted yet
+            $hasNewItems = false;
+            if (!empty($cart)) {
+                // Use the current batch number from session
+                $currentBatch = session('batch_number', 1);
+                
+                foreach ($cart as $item) {
+                    $existingItem = OrderItem::where('order_id', $orderId)
+                        ->where('product_id', $item['id'])
+                        ->first();
+                    
+                    if (!$existingItem) {
+                        OrderItem::create([
+                            'order_id' => $orderId,
+                            'product_id' => $item['id'],
+                            'qty' => $item['qty'],
+                            'price' => $item['price'],
+                            'note' => null,
+                            'batch' => $currentBatch,
+                        ]);
+                        $hasNewItems = true;
+                    }
                 }
-            } else {
-                $total = 0;
-                foreach($cart as $item) {
-                    $total += $item['price'] * $item['qty'];
-                }
+            }
+
+            // compute total from persisted order items
+            $total = 0;
+            foreach ($order->fresh()->items as $it) {
+                $total += $it->price * $it->qty;
             }
 
             $order->customer_name = $request->customer_name ?? $order->customer_name;
             $order->table_number = session('table_number') ?? $request->table_number;
             $order->total = $total;
-            $order->status = 'DIPROSES';
+            
+            // If there are new items, reset status to DIPROSES so kitchen knows there's a new batch
+            if ($hasNewItems) {
+                $order->status = 'DIPROSES';
+            } else {
+                $order->status = 'DIPROSES';
+            }
+            
             $order->save();
 
         } else {
@@ -141,6 +170,9 @@ class CartController extends Controller
                 'status' => 'DIPROSES',
             ]);
 
+            // Set batch to 1 for the first checkout
+            $batch = 1;
+            
             foreach($cart as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -148,14 +180,25 @@ class CartController extends Controller
                     'qty' => $item['qty'],
                     'price' => $item['price'],
                     'note' => null,
+                    'batch' => $batch,
                 ]);
             }
+            
+            // Store order_id and batch_number in session for future additions
+            session()->put('order_id', $order->id);
+            session()->put('batch_number', $batch);
         }
 
         DB::commit();
 
         // store last order id so front-end can link to status
         session()->put('last_order_id', $order->id);
+
+        // For existing orders (checkout kedua, ketiga, dst), increment batch for next checkout
+        if ($orderId) {
+            $currentBatch = session('batch_number', 1);
+            session()->put('batch_number', $currentBatch + 1);
+        }
 
         // clear only the cart; keep order_id/table_number in session so
         // the customer can track status (kasir/kitchen will progress it)

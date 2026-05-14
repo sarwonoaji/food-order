@@ -21,6 +21,7 @@ Route::post('/cart/remove/{id}', [CartController::class, 'remove']);
 Route::post('/cart/remove-one/{id}', [CartController::class, 'removeOne']);
 Route::post('/checkout', [CartController::class, 'checkout']);
 Route::get('/order/{id}', [CartController::class, 'showOrder']);
+Route::post('/save-name', [ProductController::class, 'saveName']);
 
 Route::resource('/admin/products', ProductAdminController::class);
 Route::get('/admin/products', [ProductAdminController::class, 'index']);    

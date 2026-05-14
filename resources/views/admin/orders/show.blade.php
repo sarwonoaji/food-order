@@ -58,22 +58,34 @@
 
 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-6">
     <h2 class="text-xl font-bold mb-4">Item Pesanan</h2>
-    <div class="divide-y">
-        @foreach($order->items as $item)
-        <div class="py-3 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div>
-                    <div class="font-semibold text-gray-800">{{ $item->product->name }}</div>
-                    <div class="text-sm text-gray-400">{{ $item->product->description ?? '' }}</div>
+    
+    @php
+        $itemsByBatch = $order->items->groupBy('batch');
+    @endphp
+    
+    @foreach($itemsByBatch as $batch => $items)
+    <div class="mb-6 pb-6 {{ !$loop->last ? 'border-b' : '' }}">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 mb-3">
+            <span class="text-sm font-semibold">Batch {{ $batch }}</span>
+        </div>
+        <div class="divide-y">
+            @foreach($items as $item)
+            <div class="py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="font-semibold text-gray-800">{{ $item->product->name }}</div>
+                        <div class="text-sm text-gray-400">{{ $item->product->description ?? '' }}</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">{{ $item->qty }} x Rp {{ number_format($item->price) }}</div>
+                    <div class="font-semibold text-orange-500">Rp {{ number_format($item->price * $item->qty) }}</div>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-sm text-gray-500">{{ $item->qty }} x Rp {{ number_format($item->price) }}</div>
-                <div class="font-semibold text-orange-500">Rp {{ number_format($item->price * $item->qty) }}</div>
-            </div>
+            @endforeach
         </div>
-        @endforeach
     </div>
+    @endforeach
 </div>
 
 

@@ -14,6 +14,15 @@ class ProductController extends Controller
         $category = $request->category;
         $term = $request->q;
 
+        if ($request->filled('table') && !session('customer_name')) {
+
+            session()->put('table_number', $request->table);
+
+            return view('input-name', [
+                'table' => $request->table
+            ]);
+}
+
         // If a table param is present (scanned QR), create/open an order and set session
         if ($request->filled('table')) {
             $table = $request->table;
@@ -34,9 +43,13 @@ class ProductController extends Controller
                     if ($open) {
                         session()->put('order_id', $open->id);
                         session()->put('last_order_id', $open->id);
+                        // Keep existing batch_number for continuing order
                     } else {
+                        // Clear order-related sessions for new order
+                        session()->forget(['order_id', 'batch_number']);
+                        
                         $order = Order::create([
-                            'customer_name' => null,
+                            'customer_name' => session('customer_name'),
                             'table_number' => $table,
                             'total' => 0,
                             'status' => 'MENUNGGU',
@@ -56,9 +69,13 @@ class ProductController extends Controller
                 if ($open) {
                     session()->put('order_id', $open->id);
                     session()->put('last_order_id', $open->id);
+                    // Keep existing batch_number for continuing order
                 } else {
+                    // Clear order-related sessions for new order
+                    session()->forget(['order_id', 'batch_number']);
+                    
                     $order = Order::create([
-                        'customer_name' => null,
+                        'customer_name' => session('customer_name'),
                         'table_number' => $table,
                         'total' => 0,
                         'status' => 'MENUNGGU',
@@ -97,6 +114,22 @@ class ProductController extends Controller
             'category',
             'term',
             'bestSellerIds'
-        ));;
+        ));
             }
+
+             // simpan nama customer
+    public function saveName(Request $request)
+    {
+        $request->validate([
+            'customer_name' => 'required|max:50',
+            'table' => 'required',
+        ]);
+
+        session()->put('customer_name', $request->customer_name);
+        
+        // Clear order-related sessions for new customer
+        session()->forget(['order_id', 'batch_number']);
+
+        return redirect('/?table=' . $request->table);
+    }
 }

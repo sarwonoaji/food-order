@@ -165,8 +165,19 @@
 
     {{-- ITEM --}}
     <table class="items">
+        @php
+            $itemsByBatch = $order->items->groupBy('batch');
+        @endphp
 
-        @foreach($order->items as $item)
+        @foreach($itemsByBatch as $batch => $items)
+        
+        <tr>
+            <td colspan="2" style="font-weight: bold; padding-top: 8px;">
+                --- Batch {{ $batch }} ---
+            </td>
+        </tr>
+
+        @foreach($items as $item)
 
         <tr>
             <td colspan="2" class="item-name">
@@ -183,6 +194,8 @@
                 Rp {{ number_format($item->qty * $item->price) }}
             </td>
         </tr>
+
+        @endforeach
 
         @endforeach
 

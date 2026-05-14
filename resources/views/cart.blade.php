@@ -97,11 +97,11 @@
         <form action="/checkout" method="POST">
             @csrf
 
-            <div class="space-y-3">
+            <!-- <div class="space-y-3">
                 <label class="text-sm text-gray-700">Nama</label>
                 <input type="text" name="customer_name" class="input input-bordered w-full rounded-lg" placeholder="Nama pemesan" required>
 
-           </div>
+           </div> -->
 
             <div class="mt-6">
                 <button class="btn w-full bg-orange-500 hover:bg-orange-600 text-white">Checkout — Rp {{ number_format($total) }}</button>

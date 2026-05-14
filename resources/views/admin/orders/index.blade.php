@@ -73,8 +73,16 @@
                 <div class="font-semibold text-orange-500">Rp {{ number_format($order->total) }}</div>
             </div>
             <div>
-                <div class="text-xs text-gray-400">Items</div>
-                <div class="font-medium text-gray-800">{{ $order->items->count() }} item</div>
+                <div class="text-xs text-gray-400">Items (Batch Terbaru)</div>
+                <div class="font-medium text-gray-800">
+                    {{ $order->items->count() }} item
+                    @php
+                        $maxBatch = $order->items->max('batch') ?? 1;
+                    @endphp
+                    <span class="ml-1 px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                        #{{ $maxBatch }}
+                    </span>
+                </div>
             </div>
         </div>
 
