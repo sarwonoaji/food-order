@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -73,9 +73,39 @@
                             @endif
                         </div>
 
-                        <div class="mt-6">
-                            <button class="btn btn-warning w-full">Update Produk</button>
-                        </div>
+                        <div class="form-control mt-4">
+
+                        <label class="label cursor-pointer justify-start gap-4">
+
+                            <span class="label-text font-semibold text-sm">
+                                Status Produk
+                            </span>
+
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                value="1"
+                                 class="toggle bg-gray-300 border-gray-300 checked:bg-orange-500 checked:border-orange-500"
+                                {{ old('is_active', $product->is_active) ? 'checked' : '' }}
+                            />
+
+                            <span class="text-sm text-gray-500">
+                                Aktif
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                        <div class="mt-6 flex justify-center">
+
+                        <button
+                            class="h-10 px-5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-sm font-semibold rounded-2xl shadow-sm transition-all duration-150 border-0"
+                        >
+                            Update Produk
+                        </button>
+
+                    </div>
 
                     </form>
 

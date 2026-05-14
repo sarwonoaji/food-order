@@ -33,3 +33,4 @@ Route::get('/admin/qrcodes', [QrCodeController::class, 'index']);
 Route::get('/admin/orders', [OrderAdminController::class, 'index']);
 Route::get('/admin/orders/{id}', [OrderAdminController::class, 'show']);
 Route::post('/admin/orders/{id}/status', [OrderAdminController::class, 'updateStatus']);
+Route::get('/admin/orders/{id}/print',[OrderAdminController::class, 'print']);

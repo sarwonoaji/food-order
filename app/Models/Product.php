@@ -12,5 +12,6 @@ class Product extends Model
     'description',
     'image',
     'category',
+    'is_active',
 ];
 }

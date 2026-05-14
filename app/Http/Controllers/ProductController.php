@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -69,6 +70,14 @@ class ProductController extends Controller
             }
         }
 
+        //best seller
+        $bestSellerIds = DB::table('order_items')
+            ->select('product_id', DB::raw('SUM(qty) as total_qty'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->limit(3)
+            ->pluck('product_id');
+
         $products = Product::query()
             ->when($category, function ($query) use ($category) {
                 $query->where('category', $category);
@@ -83,6 +92,11 @@ class ProductController extends Controller
             ->latest()
             ->get();
 
-        return view('menu', compact('products', 'category', 'term'));
-    }
+        return view('menu', compact(
+            'products',
+            'category',
+            'term',
+            'bestSellerIds'
+        ));;
+            }
 }

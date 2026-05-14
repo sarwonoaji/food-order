@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -62,6 +62,30 @@
                             <textarea name="description" class="textarea textarea-bordered min-h-[120px] p-3 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200" placeholder="Deskripsi singkat produk (mis. bahan, porsi, catatan)" aria-label="Deskripsi">{{ old('description') }}</textarea>
                             @error('description') <p class="text-sm text-error mt-1">{{ $message }}</p> @enderror
                         </div>
+
+                        <div class="form-control mt-4">
+
+                        <label class="label cursor-pointer justify-start gap-4">
+
+                            <span class="label-text font-semibold text-sm">
+                                Status Produk
+                            </span>
+
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                value="1"
+                                 class="toggle bg-gray-300 border-gray-300 checked:bg-orange-500 checked:border-orange-500"
+                                {{ old('is_active', true) ? 'checked' : '' }}
+                            />
+
+                            <span class="text-sm text-gray-500">
+                                Aktif
+                            </span>
+
+                        </label>
+
+                    </div>
 
                         <div class="mt-6">
                             <button class="btn btn-warning w-full">Simpan Produk</button>

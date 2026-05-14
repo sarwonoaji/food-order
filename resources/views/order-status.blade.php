@@ -28,7 +28,6 @@
     $statusPill = match($order->status) {
         'MENUNGGU' => 'bg-orange-100 text-orange-700',
         'DIPROSES' => 'bg-blue-100 text-blue-700',
-        'DIMASAK' => 'bg-yellow-100 text-yellow-800',
         'SIAP' => 'bg-green-100 text-green-800',
         'SELESAI' => 'bg-gray-200 text-gray-700',
         default => 'bg-gray-100 text-gray-800'
@@ -43,7 +42,16 @@
                 <div class="text-2xl font-bold text-gray-800">#{{ $order->id }}</div>
                 <div class="text-sm text-gray-500">• {{ $order->created_at->format('d M Y H:i') }}</div>
             </div>
-            <div class="mt-2 text-sm text-gray-600">{{ $order->customer_name }} • Meja {{ $order->table_number }}</div>
+            <div class="mt-3 flex items-center gap-2 flex-wrap">
+        <div class="text-sm text-gray-600">
+            {{ $order->customer_name }}
+        </div>
+
+        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
+            Meja {{ $order->table_number }}
+        </div>
+
+</div>
         </div>
 
         <div class="text-right">
@@ -56,39 +64,63 @@
 
 <!-- Progress (horizontal) -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
         <h2 class="text-lg font-bold">Progress Pesanan</h2>
-        <div class="text-sm text-gray-500">Status saat ini: <span class="font-semibold text-gray-700">{{ $order->status }}</span></div>
+
+        <div class="text-sm text-gray-500">
+            Status saat ini:
+            <span class="font-semibold text-gray-700">
+                {{ $order->status }}
+            </span>
+        </div>
     </div>
 
     @php
         $steps = [
             ['key' => 'MENUNGGU', 'label' => 'Diterima', 'icon' => '✓'],
             ['key' => 'DIPROSES', 'label' => 'Diproses', 'icon' => '🧾'],
-            ['key' => 'DIMASAK', 'label' => 'Dimakas', 'icon' => '🍳'],
             ['key' => 'SIAP', 'label' => 'Siap', 'icon' => '🍽️'],
             ['key' => 'SELESAI', 'label' => 'Selesai', 'icon' => '✅'],
         ];
+
         $current = $order->status;
         $keys = array_column($steps, 'key');
     @endphp
 
-    <div class="flex gap-4 items-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         @foreach($steps as $s)
+
             @php
                 $posS = array_search($s['key'], $keys);
                 $posCurrent = array_search($current, $keys);
-                $done = ($posCurrent !== false) && ($posS !== false) && ($posS <= $posCurrent);
+
+                $done = ($posCurrent !== false)
+                    && ($posS !== false)
+                    && ($posS <= $posCurrent);
             @endphp
-            <div class="flex-1">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $done ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500' }}">{!! $s['icon'] !!}</div>
-                    <div>
-                        <div class="text-sm font-semibold {{ $done ? 'text-gray-800' : 'text-gray-500' }}">{{ $s['label'] }}</div>
-                        <div class="text-xs text-gray-400">{{ $s['key'] }}</div>
+
+            <div class="border rounded-2xl p-4 flex items-center gap-3">
+                
+                <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center
+                    {{ $done
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-gray-200 text-gray-500' }}">
+                    {!! $s['icon'] !!}
+                </div>
+
+                <div class="min-w-0">
+                    <div class="font-semibold truncate
+                        {{ $done ? 'text-gray-800' : 'text-gray-500' }}">
+                        {{ $s['label'] }}
+                    </div>
+
+                    <div class="text-xs text-gray-400 break-words">
+                        {{ $s['key'] }}
                     </div>
                 </div>
+
             </div>
+
         @endforeach
     </div>
 </div>

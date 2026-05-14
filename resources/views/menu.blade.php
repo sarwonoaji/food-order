@@ -22,7 +22,7 @@ $cartCount = collect($cart)->sum('qty');
             </h1>
 
             <p class="text-gray-500 mt-1 text-sm md:text-base">
-                Pilih makanan favoritmu 🍜
+                Pilih menu favoritmu
             </p>
 
         </div>
@@ -30,25 +30,9 @@ $cartCount = collect($cart)->sum('qty');
         <!-- Cart + Check Order -->
         <div class="flex items-center gap-3">
 
-            {{-- direct link to last order if exists --}}
-            @if(session('last_order_id'))
-                <a href="/order/{{ session('last_order_id') }}" class="btn btn-sm btn-outline hidden sm:inline-flex">Lihat Pesanan</a>
-            @endif
+          
 
-            <div class="hidden sm:block">
-                <form id="check-order-form" onsubmit="return goToOrder(event)" class="flex items-center">
-                    <input type="text" id="check-order-id" placeholder="Cek pesanan (ID)" class="input input-sm input-bordered rounded-full pr-10" aria-label="Cek pesanan ID">
-                    <button type="submit" class="btn btn-sm ml-2">Cek</button>
-                </form>
-            </div>
-
-            <!-- Cart -->
-            <a
-                href="/cart"
-                class="relative"
-            >
-
-            <button
+            <!-- <button
                 class="btn btn-circle bg-orange-500 hover:bg-orange-600 border-0 text-white shadow-lg"
             >
 
@@ -65,19 +49,9 @@ $cartCount = collect($cart)->sum('qty');
 
                 </svg>
 
-            </button>
+            </button> -->
 
-            @if($cartCount > 0)
-
-            <div
-                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow"
-            >
-
-                {{ $cartCount }}
-
-            </div>
-
-            @endif
+       
 
         </a>
 
@@ -177,34 +151,88 @@ $cartCount = collect($cart)->sum('qty');
 </div>
 
 <!-- Product Grid (2 cards per row) -->
-<div class="grid grid-cols-2 gap-6">
+        <div class="grid grid-cols-2 gap-6">
 
-    @foreach($products as $product)
+            @foreach($products as $product)
 
-    <div class="card card-compact bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition duration-200 border">
-
+            <div class="card card-compact rounded-2xl overflow-hidden shadow-sm transition duration-200 border
+            {{ $product->is_active 
+                ? 'bg-white hover:shadow-lg' 
+                : 'bg-gray-100 opacity-80'
+            }}">
         <figure class="relative">
+
             @if($product->image)
-                <img src="{{ asset('img/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-44 object-cover">
+
+                <img
+                    src="{{ asset('img/products/' . $product->image) }}"
+                    alt="{{ $product->name }}"
+                    class="w-full h-44 object-cover
+                    {{ !$product->is_active ? 'grayscale' : '' }}"
+                >
+
             @else
-                <div class="w-full h-44 bg-base-200 flex items-center justify-center text-sm text-muted">No Image</div>
+
+                <div class="w-full h-44 bg-base-200 flex items-center justify-center text-sm text-muted">
+                    No Image
+                </div>
+
             @endif
 
-            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-orange-500 shadow">{{ $product->category }}</div>
+            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-orange-500 shadow">
+                {{ $product->category }}
+            </div>
+
+            @if($bestSellerIds->contains($product->id) && $product->is_active)
+
+            <div class="absolute bottom-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                🔥 Best Seller
+            </div>
+
+            @endif
+
+            @if(!$product->is_active)
+
+                <div class="absolute top-3 right-3 bg-gray-700 text-white px-3 py-1 rounded-full text-xs font-semibold shadow">
+                    Tidak Tersedia
+                </div>
+
+            @endif
+
         </figure>
 
         <div class="p-4">
             <h3 class="font-semibold text-gray-800 text-sm md:text-base line-clamp-2">{{ $product->name }}</h3>
             <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ $product->description }}</p>
+        <br>
+           <div class="mt-4 flex items-center justify-between">
 
-            <div class="mt-4 flex items-center justify-between">
-                <div class="text-orange-500 font-bold">Rp {{ number_format($product->price) }}</div>
-
-                <form action="/cart/add/{{ $product->id }}" method="POST">
-                    @csrf
-                    <button class="btn btn-sm btn-primary rounded-xl px-3 py-2">Tambah</button>
-                </form>
+            <div class="font-bold
+                {{ $product->is_active ? 'text-orange-500' : 'text-gray-500' }}">
+                Rp {{ number_format($product->price) }}
             </div>
+
+            @if($product->is_active)
+
+                <div class="ml-auto">
+
+                    <form action="/cart/add/{{ $product->id }}" method="POST">
+                        @csrf
+
+                        <button
+                            class="w-10 h-10 rounded-xl bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-md transition"
+                        >
+                            +
+                        </button>
+
+                    </form>
+
+                </div>
+
+            @endif
+
+        </div>
+
         </div>
 
     </div>
@@ -214,9 +242,10 @@ $cartCount = collect($cart)->sum('qty');
 </div>
 
 <!-- Floating Cart Mobile -->
+<!-- Floating Cart -->
 <a
     href="/cart"
-    class="fixed bottom-5 right-5 md:hidden z-50"
+    class="fixed bottom-5 right-5 z-50"
 >
 
     <div class="relative">
@@ -232,9 +261,7 @@ $cartCount = collect($cart)->sum('qty');
         <div
             class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow"
         >
-
             {{ $cartCount }}
-
         </div>
 
         @endif
@@ -242,14 +269,23 @@ $cartCount = collect($cart)->sum('qty');
     </div>
 
 </a>
+
+<!-- Floating Order -->
 @if(session('last_order_id'))
-    <a href="/order/{{ session('last_order_id') }}" class="fixed bottom-5 right-20 md:hidden z-50">
-        <div class="relative">
-            <button class="btn btn-circle w-14 h-14 bg-white text-orange-500 border shadow-lg">
-                🧾
-            </button>
-        </div>
-    </a>
+
+<a
+    href="/order/{{ session('last_order_id') }}"
+    class="fixed bottom-5 right-24 z-50"
+>
+
+    <button
+        class="btn btn-circle w-14 h-14 bg-white hover:bg-gray-100 text-orange-500 border border-gray-200 shadow-xl"
+    >
+        🧾
+    </button>
+
+</a>
+
 @endif
 
 @endsection

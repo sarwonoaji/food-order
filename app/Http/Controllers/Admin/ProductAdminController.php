@@ -47,6 +47,7 @@ class ProductAdminController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
+            'is_active' => 'nullable|boolean',
         ]);
 
        // upload foto
@@ -69,6 +70,7 @@ class ProductAdminController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'image' => $data['image'] ?? null,
+            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect('/admin/products')
@@ -94,6 +96,7 @@ class ProductAdminController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
+            'is_active' => 'nullable|boolean',
         ]);
 
                   // upload image baru
@@ -128,6 +131,7 @@ class ProductAdminController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'image' => $data['image'] ?? $product->image,
+            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect('/admin/products')

@@ -10,7 +10,7 @@
     </h1>
 
     <p class="text-gray-500 mt-1">
-        Review pesanan kamu 🍜
+        Review pesanan kamu
     </p>
 
 </div>

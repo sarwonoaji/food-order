@@ -49,4 +49,22 @@ class OrderAdminController extends Controller
             'Status berhasil diupdate'
         );
     }
+   public function print(Request $request, $id)
+        {
+            $order = Order::with('items.product')
+                ->findOrFail($id);
+
+            $paid = $request->paid ?? 0;
+
+            $change = $paid - $order->total;
+
+            return view(
+                'admin.orders.print',
+                compact(
+                    'order',
+                    'paid',
+                    'change'
+                )
+            );
+        }
 }

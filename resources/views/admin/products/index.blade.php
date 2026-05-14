@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -9,22 +9,54 @@
         <p class="text-sm text-muted">Kelola daftar produk menu Anda.</p>
     </div>
 
-    <div class="flex items-center gap-3 w-full md:w-auto">
-        <div class="flex-1 md:flex-none">
-            <form action="" method="GET">
-                <div class="form-control">
-                    <div class="input-group">
-                        <input type="search" name="q" placeholder="Cari produk..." class="input input-bordered" value="{{ request('q') }}">
-                        <button type="submit" class="btn btn-square">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2.5a7.5 7.5 0 010 14.15z"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </form>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+    <!-- Search -->
+    <form action="" method="GET" class="w-full md:w-auto">
+        
+        <div class="join w-full md:w-[350px]">
+
+            <input 
+                type="search"
+                name="q"
+                placeholder="Cari produk..."
+                value="{{ request('q') }}"
+                class="input join-item w-full 
+                    rounded-full
+                    border border-gray-300
+                    focus:border-gray-400
+                    focus:outline-none
+                    bg-white shadow-sm px-5"
+            />
+
+            <button 
+                type="submit"
+                class="h-10 px-5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-sm font-semibold rounded-2xl shadow-sm transition-all duration-150 border-0"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2.5a7.5 7.5 0 010 14.15z" />
+                </svg>
+            </button>
+
         </div>
 
-        <a href="/admin/products/create" class="btn btn-warning">Tambah Produk</a>
-    </div>
+    </form>
+
+    <!-- Button -->
+    <a href="/admin/products/create"
+        class="btn bg-orange-500 hover:bg-orange-600 text-white border-0 rounded-full px-6">
+        Tambah Produk
+    </a>
+
+</div>
 
 </div>
 
@@ -44,6 +76,7 @@
                     <th></th>
                     <th>Nama</th>
                     <th>Kategori</th>
+                    <th>Status</th>
                     <th>Harga</th>
                     <th class="text-right">Aksi</th>
                 </tr>
@@ -70,6 +103,12 @@
                     </td>
 
                     <td>Rp {{ number_format($product->price) }}</td>
+
+                    <td>
+                        <div class="badge {{ $product->is_active ? 'badge-success' : 'badge-error' }}">
+                            {{ $product->is_active ? 'Aktif' : 'Non Aktif' }}
+                        </div>
+                    </td>
 
                     <td class="text-right">
                         <div class="inline-flex items-center gap-2">

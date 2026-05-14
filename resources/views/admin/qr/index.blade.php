@@ -1,6 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
+
+@php
+    $base = "http://10.83.78.254:8000";
+@endphp
 
 <div class="mb-6">
     <h1 class="text-2xl font-bold">QR Codes Meja</h1>

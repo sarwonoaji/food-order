@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -14,7 +14,6 @@
     $statusColor = match($order->status) {
         'MENUNGGU' => 'bg-gray-100 text-gray-800',
         'DIPROSES' => 'bg-blue-100 text-blue-800',
-        'DIMASAK' => 'bg-yellow-100 text-yellow-800',
         'SIAP' => 'bg-green-100 text-green-800',
         'SELESAI' => 'bg-gray-200 text-gray-700',
         default => 'bg-gray-100 text-gray-800'
@@ -89,7 +88,6 @@
                 <select id="status" name="status" class="select select-bordered rounded-lg w-full md:w-72">
                     <option value="MENUNGGU" {{ $order->status === 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
                     <option value="DIPROSES" {{ $order->status === 'DIPROSES' ? 'selected' : '' }}>DIPROSES</option>
-                    <option value="DIMASAK" {{ $order->status === 'DIMASAK' ? 'selected' : '' }}>DIMASAK</option>
                     <option value="SIAP" {{ $order->status === 'SIAP' ? 'selected' : '' }}>SIAP</option>
                     <option value="SELESAI" {{ $order->status === 'SELESAI' ? 'selected' : '' }}>SELESAI</option>
                 </select>

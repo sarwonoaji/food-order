@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -37,7 +37,6 @@
         $statusColor = match($order->status) {
             'MENUNGGU' => 'bg-gray-100 text-gray-800',
             'DIPROSES' => 'bg-blue-100 text-blue-800',
-            'DIMASAK' => 'bg-yellow-100 text-yellow-800',
             'SIAP' => 'bg-green-100 text-green-800',
             'SELESAI' => 'bg-gray-200 text-gray-700',
             default => 'bg-gray-100 text-gray-800'
@@ -80,7 +79,19 @@
         </div>
 
         <div class="mt-4 flex items-center justify-end gap-2">
-            <a href="/admin/orders/{{ $order->id }}" class="btn btn-sm btn-ghost">Lihat</a>
+            <a
+                href="/admin/orders/{{ $order->id }}"
+                class="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-gray-100 text-gray-700 text-sm font-semibold rounded-2xl shadow-sm border border-gray-200 transition-all duration-150">
+                Lihat
+            </a>
+           <button
+            class="h-10 px-5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-sm font-semibold rounded-2xl shadow-sm transition-all duration-150 border-0"
+            onclick="openPaymentModal(
+                {{ $order->id }},
+                {{ $order->total }}
+            )">
+            Bayar & Cetak
+            </button>
             {{-- @if($order->status !== 'SELESAI')
                 <form action="/admin/orders/{{ $order->id }}/status" method="post" onsubmit="return confirm('Tandai sebagai SELESAI?')">
                     @csrf
@@ -112,6 +123,120 @@
     }
     document.getElementById('order-search').addEventListener('input', applyFilter);
     document.getElementById('order-filter').addEventListener('change', applyFilter);
+
+
+        function openPaymentModal(id, total)
+        {
+            document.getElementById('order_id').value = id;
+
+            document.getElementById('total').value =
+                'Rp ' + total.toLocaleString();
+
+            document.getElementById('paid').value = '';
+
+            document.getElementById('change').value = '';
+
+            document.getElementById('printForm').action =
+                '/admin/orders/' + id + '/print';
+
+            document.getElementById('paymentModal').showModal();
+
+            window.currentTotal = total;
+}
+
+        function calculateChange()
+        {
+            let paid =
+                parseInt(document.getElementById('paid').value) || 0;
+
+            let total = window.currentTotal;
+
+            let change = paid - total;
+
+            document.getElementById('change').value =
+                'Rp ' + change.toLocaleString();
+
+            document.getElementById('paid_input').value = paid;
+        }
+
+        function closePaymentModal()
+        {
+            document
+                .getElementById('paymentModal')
+                .close();
+        }
+
+
 </script>
 
 @endsection
+
+<dialog id="paymentModal" class="modal">
+
+    <div class="modal-box rounded-3xl">
+
+        <h3 class="font-bold text-lg mb-4">
+            Pembayaran
+        </h3>
+
+        <input type="hidden" id="order_id">
+
+        <div class="mb-3">
+            <label class="text-sm">Total</label>
+
+            <input
+                type="text"
+                id="total"
+                class="input input-bordered w-full"
+                readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="text-sm">Uang Bayar</label>
+
+            <input
+                type="number"
+                id="paid"
+                class="input input-bordered w-full"
+                oninput="calculateChange()">
+        </div>
+
+        <div class="mb-4">
+            <label class="text-sm">Kembalian</label>
+
+            <input
+                type="text"
+                id="change"
+                class="input input-bordered w-full"
+                readonly>
+        </div>
+
+        <div class="flex justify-end gap-2">
+
+            <button
+                type="button"
+                onclick="closePaymentModal()"
+                class="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-gray-100 text-gray-700 text-sm font-semibold rounded-2xl shadow-sm border border-gray-200 transition-all duration-150">
+                Tutup
+            </button>
+
+            <form id="printForm" method="GET" target="_blank">
+
+            <input
+                type="hidden"
+                name="paid"
+                id="paid_input">
+
+            <button
+                type="submit"
+                class="h-11 px-6 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-2xl shadow-sm transition-all duration-200">
+                Cetak
+            </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</dialog>
