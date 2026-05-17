@@ -12,7 +12,7 @@
 
 @php
     $statusColor = match($order->status) {
-        'MENUNGGU' => 'bg-gray-100 text-gray-800',
+        'MEMESAN' => 'bg-orange-100 text-orange-700',
         'DIPROSES' => 'bg-blue-100 text-blue-800',
         'SIAP' => 'bg-green-100 text-green-800',
         'SELESAI' => 'bg-gray-200 text-gray-700',
@@ -98,7 +98,7 @@
             <div class="flex gap-3 items-center">
                 <label for="status" class="sr-only">Pilih status</label>
                 <select id="status" name="status" class="select select-bordered rounded-lg w-full md:w-72">
-                    <option value="MENUNGGU" {{ $order->status === 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
+                    <option value="MEMESAN" {{ $order->status === 'MEMESAN' ? 'selected' : '' }}>MEMESAN</option>
                     <option value="DIPROSES" {{ $order->status === 'DIPROSES' ? 'selected' : '' }}>DIPROSES</option>
                     <option value="SIAP" {{ $order->status === 'SIAP' ? 'selected' : '' }}>SIAP</option>
                     <option value="SELESAI" {{ $order->status === 'SELESAI' ? 'selected' : '' }}>SELESAI</option>

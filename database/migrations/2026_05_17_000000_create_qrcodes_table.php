@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('qrcodes', function (Blueprint $table) {
             $table->id();
-            $table->string('customer_name')->nullable();
-            $table->string('table_number')->nullable();
-            $table->integer('total')->default(0);
-            $table->string('status')->default('MEMESAN'); // MEMESAN, MENUNGGU, SELESAI
+            $table->string('table_number')->unique();
+            $table->string('code')->unique();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('qrcodes');
     }
 };

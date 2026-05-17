@@ -10,7 +10,7 @@
     </h1>
 
     <p class="text-gray-500 mt-2">
-        Pantau pesanan kamu secara realtime 🍜
+        Pantau pesanan kamu secara realtime
     </p>
 
     <div class="mt-4">
@@ -26,7 +26,7 @@
 <!-- Order Info -->
 @php
     $statusPill = match($order->status) {
-        'MENUNGGU' => 'bg-orange-100 text-orange-700',
+        'MEMESAN' => 'bg-orange-100 text-orange-700',
         'DIPROSES' => 'bg-blue-100 text-blue-700',
         'SIAP' => 'bg-green-100 text-green-800',
         'SELESAI' => 'bg-gray-200 text-gray-700',
@@ -77,7 +77,7 @@
 
     @php
         $steps = [
-            ['key' => 'MENUNGGU', 'label' => 'Diterima', 'icon' => '✓'],
+            ['key' => 'MEMESAN', 'label' => 'Diterima', 'icon' => '✓'],
             ['key' => 'DIPROSES', 'label' => 'Diproses', 'icon' => '🧾'],
             ['key' => 'SIAP', 'label' => 'Siap', 'icon' => '🍽️'],
             ['key' => 'SELESAI', 'label' => 'Selesai', 'icon' => '✅'],

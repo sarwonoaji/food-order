@@ -35,7 +35,7 @@
 
     @php
         $statusColor = match($order->status) {
-            'MENUNGGU' => 'bg-gray-100 text-gray-800',
+            'MEMESAN' => 'bg-orange-100 text-orange-700',
             'DIPROSES' => 'bg-blue-100 text-blue-800',
             'SIAP' => 'bg-green-100 text-green-800',
             'SELESAI' => 'bg-gray-200 text-gray-700',
@@ -98,7 +98,7 @@
                 {{ $order->id }},
                 {{ $order->total }}
             )">
-            Bayar & Cetak
+            Cetak
             </button>
             {{-- @if($order->status !== 'SELESAI')
                 <form action="/admin/orders/{{ $order->id }}/status" method="post" onsubmit="return confirm('Tandai sebagai SELESAI?')">

@@ -66,6 +66,14 @@ class CartController extends Controller
             }
         }
 
+        $cartCount = collect($cart)->sum('qty');
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'cartCount' => $cartCount
+                ]);
+            }
         return redirect()->back()
             ->with('success', 'Produk ditambahkan ke keranjang');
     }

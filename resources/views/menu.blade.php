@@ -164,11 +164,20 @@ $cartCount = collect($cart)->sum('qty');
 
             @if($product->image)
 
-                <img
+                <!-- <img
                     src="{{ asset('img/products/' . $product->image) }}"
                     alt="{{ $product->name }}"
                     class="w-full h-44 object-cover
                     {{ !$product->is_active ? 'grayscale' : '' }}"
+                > -->
+                <img
+                    loading="lazy"
+                    decoding="async"
+                    src="{{ asset('img/products/' . $product->image) }}"
+                    alt="{{ $product->name }}"
+                    class="w-full h-44 object-cover transition duration-300 blur-sm scale-105
+                    {{ !$product->is_active ? 'grayscale' : '' }}"
+                    onload="this.classList.remove('blur-sm','scale-105')"
                 >
 
             @else
@@ -216,16 +225,13 @@ $cartCount = collect($cart)->sum('qty');
 
                 <div class="ml-auto">
 
-                    <form action="/cart/add/{{ $product->id }}" method="POST">
-                        @csrf
-
-                        <button
-                            class="w-10 h-10 rounded-xl bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-md transition"
-                        >
-                            +
-                        </button>
-
-                    </form>
+                <button
+                    type="button"
+                    onclick="addToCart({{ $product->id }})"
+                    class="w-10 h-10 rounded-xl bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-md transition"
+                >
+                    +
+                </button>
 
                 </div>
 
@@ -256,15 +262,13 @@ $cartCount = collect($cart)->sum('qty');
             🛒
         </button>
 
-        @if($cartCount > 0)
-
-        <div
-            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow"
-        >
-            {{ $cartCount }}
-        </div>
-
-        @endif
+      <div
+        id="cart-count"
+        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow
+        {{ $cartCount <= 0 ? 'hidden' : '' }}"
+    >
+        {{ $cartCount }}
+    </div>
 
     </div>
 
@@ -287,5 +291,40 @@ $cartCount = collect($cart)->sum('qty');
 </a>
 
 @endif
+
+<script>
+    async function addToCart(productId) {
+
+        try {
+
+            const response = await fetch(`/cart/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+            const data = await response.json();
+
+            const badge = document.getElementById('cart-count');
+
+            if (badge) {
+
+                badge.innerText = data.cartCount;
+
+                // tampilkan badge kalau sebelumnya hidden
+                if (data.cartCount > 0) {
+                    badge.classList.remove('hidden');
+                }
+
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+</script>
 
 @endsection
